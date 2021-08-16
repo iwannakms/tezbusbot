@@ -1,9 +1,9 @@
 import sys
 import traceback
-
+import os
 import telebot
 import collections
-
+from flask import Flask, request
 from mysql.connector import errorcode
 from telebot import *
 import mysql.connector
@@ -34,8 +34,10 @@ except mysql.connector.Error as err:
 
 mycursor = mydb.cursor()
 
-
-bot = telebot.TeleBot("1794881977:AAFtVmJ2etRkwrRK1KxYzc_AOcIywuHodyU")
+TOKEN = "1794881977:AAFtVmJ2etRkwrRK1KxYzc_AOcIywuHodyU"
+APP_URL = f"https://tezbusbot.herokuapp.com/"
+bot = telebot.TeleBot(TOKEN)
+server = Flask(__name__)
 
 
 print("Started...")
@@ -74,6 +76,19 @@ def post_user_role(message):
         bot.send_message(message.chat.id, '❌ОШИБКА!❌ Введите заново.')
         return get_user_role(message) #ЗАНОВО ПЕРЕХОДИМ К ВВОДУ РОЛИ ПОЛЬЗОВАТЕЛЯ
 
+@server.route('/' + TOKEN, methods=['POST'])
+def get_message():
+    json_string = request.get_data().decode('utf-8')
+    update = telebot.types.Update.de_json(json_string)
+    bot.process_new_updates([update])
+    return '!', 200
+
+
+@server.route('/')
+def webhook():
+    bot.remove_webhook()
+    bot.set_webhook(url=APP_URL)
+    return '!', 200
 
 def reinput_user_role(message):
     if message.text.lower() == '↩️ввести заново роль':
@@ -445,5 +460,9 @@ def telegram_polling():
         telegram_polling()
 bot.enable_save_next_step_handlers(delay=2)
 bot.load_next_step_handlers()
+
 if __name__ == '__main__':
+
+    server.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+
     telegram_polling()
