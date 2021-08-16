@@ -1,0 +1,71 @@
+
+
+Mon Aug 16 14:34:27 2021
+<<ERROR polling>>
+Traceback (most recent call last):
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/urllib3/connection.py", line 169, in _new_conn
+    conn = connection.create_connection(
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+  File "/usr/lib/python3.9/socket.py", line 953, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+socket.gaierror: [Errno -3] Temporary failure in name resolution
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/urllib3/connectionpool.py", line 699, in urlopen
+    httplib_response = self._make_request(
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/urllib3/connectionpool.py", line 382, in _make_request
+    self._validate_conn(conn)
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/urllib3/connectionpool.py", line 1010, in _validate_conn
+    conn.connect()
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/urllib3/connection.py", line 353, in connect
+    conn = self._new_conn()
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/urllib3/connection.py", line 181, in _new_conn
+    raise NewConnectionError(
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPSConnection object at 0x7f5258d5bc10>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/requests/adapters.py", line 439, in send
+    resp = conn.urlopen(
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/urllib3/connectionpool.py", line 755, in urlopen
+    retries = retries.increment(
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/urllib3/util/retry.py", line 574, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='api.telegram.org', port=443): Max retries exceeded with url: /bot1794881977:AAFtVmJ2etRkwrRK1KxYzc_AOcIywuHodyU/sendMessage?chat_id=932943902&text=%F0%9F%9A%97 (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x7f5258d5bc10>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nuradil/PycharmProjects/bot/qwe.py", line 438, in telegram_polling
+    bot.polling(none_stop=True, timeout=60) #constantly get messages from Telegram
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/telebot/__init__.py", line 619, in polling
+    self.__threaded_polling(none_stop, interval, timeout, long_polling_timeout, allowed_updates)
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/telebot/__init__.py", line 678, in __threaded_polling
+    raise e
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/telebot/__init__.py", line 641, in __threaded_polling
+    self.worker_pool.raise_exceptions()
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/telebot/util.py", line 130, in raise_exceptions
+    raise self.exception_info
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/telebot/util.py", line 82, in run
+    task(*args, **kwargs)
+  File "/home/nuradil/PycharmProjects/bot/qwe.py", line 60, in get_user_role
+    bot.send_message(message.chat.id, '🚗')
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/telebot/__init__.py", line 916, in send_message
+    apihelper.send_message(
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/telebot/apihelper.py", line 245, in send_message
+    return _make_request(token, method_url, params=payload, method='post')
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/telebot/apihelper.py", line 129, in _make_request
+    result = _get_req_session().request(
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/requests/sessions.py", line 542, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/requests/sessions.py", line 655, in send
+    r = adapter.send(request, **kwargs)
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/requests/adapters.py", line 516, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='api.telegram.org', port=443): Max retries exceeded with url: /bot1794881977:AAFtVmJ2etRkwrRK1KxYzc_AOcIywuHodyU/sendMessage?chat_id=932943902&text=%F0%9F%9A%97 (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x7f5258d5bc10>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution'))
+
+<<ERROR polling>>
