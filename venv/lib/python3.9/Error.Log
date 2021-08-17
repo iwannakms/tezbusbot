@@ -69,3 +69,74 @@ Traceback (most recent call last):
 requests.exceptions.ConnectionError: HTTPSConnectionPool(host='api.telegram.org', port=443): Max retries exceeded with url: /bot1794881977:AAFtVmJ2etRkwrRK1KxYzc_AOcIywuHodyU/sendMessage?chat_id=932943902&text=%F0%9F%9A%97 (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x7f5258d5bc10>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution'))
 
 <<ERROR polling>>
+
+Mon Aug 16 19:55:31 2021
+<<ERROR polling>>
+Traceback (most recent call last):
+  File "/home/nuradil/PycharmProjects/bot/main.py", line 453, in telegram_polling
+    bot.polling(none_stop=True, timeout=60) #constantly get messages from Telegram
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/telebot/__init__.py", line 619, in polling
+    self.__threaded_polling(none_stop, interval, timeout, long_polling_timeout, allowed_updates)
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/telebot/__init__.py", line 678, in __threaded_polling
+    raise e
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/telebot/__init__.py", line 641, in __threaded_polling
+    self.worker_pool.raise_exceptions()
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/telebot/util.py", line 130, in raise_exceptions
+    raise self.exception_info
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/telebot/util.py", line 82, in run
+    task(*args, **kwargs)
+  File "/home/nuradil/PycharmProjects/bot/main.py", line 117, in reinput_start_point
+    return post_end_point(message)
+  File "/home/nuradil/PycharmProjects/bot/main.py", line 129, in post_end_point
+    if user_data[message.chat.id]['start_point'].lower() != message.text.lower():
+KeyError: 'start_point'
+
+<<ERROR polling>>
+
+Mon Aug 16 20:01:00 2021
+<<ERROR polling>>
+Traceback (most recent call last):
+  File "/home/nuradil/PycharmProjects/bot/main.py", line 453, in telegram_polling
+    bot.polling(none_stop=True, timeout=60) #constantly get messages from Telegram
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/telebot/__init__.py", line 619, in polling
+    self.__threaded_polling(none_stop, interval, timeout, long_polling_timeout, allowed_updates)
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/telebot/__init__.py", line 678, in __threaded_polling
+    raise e
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/telebot/__init__.py", line 641, in __threaded_polling
+    self.worker_pool.raise_exceptions()
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/telebot/util.py", line 130, in raise_exceptions
+    raise self.exception_info
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/telebot/util.py", line 82, in run
+    task(*args, **kwargs)
+  File "/home/nuradil/PycharmProjects/bot/main.py", line 366, in send_recommendations
+    return send_result(message)
+  File "/home/nuradil/PycharmProjects/bot/main.py", line 419, in send_result
+    val = (user_data[message.chat.id]['id'], user_data[message.chat.id]['start_point'], user_data[message.chat.id]['end_point'], user_data[message.chat.id]['date_of_travel'], user_data[message.chat.id]['time_of_travel'], user_data[message.chat.id]['type_of_transport'], user_data[message.chat.id]['number_of_seats'], user_data[message.chat.id]['price_of_travel'], user_data[message.chat.id]['telephone'])
+KeyError: 'id'
+
+<<ERROR polling>>
+
+Tue Aug 17 01:13:21 2021
+<<ERROR polling>>
+Traceback (most recent call last):
+  File "/home/nuradil/PycharmProjects/bot/main.py", line 457, in telegram_polling
+    bot.polling(none_stop=True, timeout=60) #constantly get messages from Telegram
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/telebot/__init__.py", line 619, in polling
+    self.__threaded_polling(none_stop, interval, timeout, long_polling_timeout, allowed_updates)
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/telebot/__init__.py", line 678, in __threaded_polling
+    raise e
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/telebot/__init__.py", line 641, in __threaded_polling
+    self.worker_pool.raise_exceptions()
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/telebot/util.py", line 130, in raise_exceptions
+    raise self.exception_info
+  File "/home/nuradil/PycharmProjects/bot/venv/lib/python3.9/site-packages/telebot/util.py", line 82, in run
+    task(*args, **kwargs)
+  File "/home/nuradil/PycharmProjects/bot/main.py", line 187, in reinput_date_of_travel
+    return post_time_of_travel(message)
+  File "/home/nuradil/PycharmProjects/bot/main.py", line 200, in post_time_of_travel
+    return get_type_of_transport(message)
+  File "/home/nuradil/PycharmProjects/bot/main.py", line 213, in get_type_of_transport
+    if user_data[message.chat.id]['role'].lower() == 'пассажир' and user_data[message.chat.id]['start_point'].lower() == 'бишкек' and user_data[message.chat.id]['end_point'].lower() == 'балыкчы' or user_data[message.chat.id]['end_point'].lower() == 'рыбачье':
+KeyError: 'role'
+
+<<ERROR polling>>

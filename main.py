@@ -4,35 +4,27 @@ import os
 import telebot
 import collections
 from flask import Flask, request
-from mysql.connector import errorcode
 from telebot import *
-import mysql.connector
-
 import re
-import datetime
+import locale
+import psycopg2
 import time
+import datetime
+from datetime import datetime, timedelta
 
 
+connection = psycopg2.connect(
+user="iwannakms",
+password="iwannakms",
+host="localhost",
+port="5432",
+database="tezbus_db"
+)
 
-try:
-    mydb = mysql.connector.connect(
-      host="localhost",
-      user="root",
-      password="",
-      database="tezbus_db"
-    )
-except mysql.connector.Error as err:
-  if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-    print("Something is wrong with your user name or password")
-    sys.exit()
-  elif err.errno == errorcode.ER_BAD_DB_ERROR:
-    print("Database does not exist")
-    sys.exit()
-  else:
-    print(err)
-    sys.exit()
+cursor = connection.cursor()
+# mycursor = mydb.cursor()
 
-mycursor = mydb.cursor()
+
 
 TOKEN = "1794881977:AAFtVmJ2etRkwrRK1KxYzc_AOcIywuHodyU"
 APP_URL = f"https://tezbusbot.herokuapp.com/"
@@ -150,29 +142,22 @@ def get_date_of_travel(message):
     bot.register_next_step_handler(message, reinput_end_point)
 
 
-
 def post_date_of_travel(message):
 
-    today = datetime.date.today()
-    tomorrow = today + datetime.timedelta(days=1)
-    if message.text.lower() == 'другая дата':
-        print(message.text)
-        # user_data[message.chat.id]['date_of_travel'] = message.text
-        # bot.send_message(message.chat.id, 'Напишите дату своей поездки в формате Год-Месяц-День\nПример: 2021-12-31',)
-        # user_data[message.chat.id]['date_of_travel'] = message.text
-        # return other_date(message)
+    today = datetime.today()
+    tomorrow = today + timedelta(days=1)
+
+    if message.text.lower()[1:] == 'сегодня':
+        user_data[message.chat.id]['date_of_travel1'] = today.strftime('%d.%m.') + " ( Сегодня )"
+        user_data[message.chat.id]['date_of_travel'] = user_data[message.chat.id]['date_of_travel1']
+        user_data[message.chat.id]['date_of_travel'] = today.strftime('%Y-%m-%d')
+
     else:
-        if message.text.lower()[1:] == 'сегодня':
-            user_data[message.chat.id]['date_of_travel1'] = today.strftime('%d.%m.') + " ( Сегодня )"
-            user_data[message.chat.id]['date_of_travel'] = user_data[message.chat.id]['date_of_travel1']
-            user_data[message.chat.id]['date_of_travel'] = today.strftime('%Y-%m-%d')
+        user_data[message.chat.id]['date_of_travel1'] = tomorrow.strftime('%d.%m.') + " ( Завтра )"
+        user_data[message.chat.id]['date_of_travel'] = user_data[message.chat.id]['date_of_travel1']
+        user_data[message.chat.id]['date_of_travel'] = tomorrow.strftime('%Y-%m-%d')
 
-        else:
-            user_data[message.chat.id]['date_of_travel1'] = tomorrow.strftime('%d.%m.') + " ( Завтра )"
-            user_data[message.chat.id]['date_of_travel'] = user_data[message.chat.id]['date_of_travel1']
-            user_data[message.chat.id]['date_of_travel'] = tomorrow.strftime('%Y-%m-%d')
-
-        return get_time_of_travel(message)
+    return get_time_of_travel(message)
 
 
 
@@ -346,22 +331,41 @@ def send_recommendations(message):
         bot.send_message(message.chat.id, "🔎")
         time.sleep(4)
         if user_data[message.chat.id]['role'] == "Пассажир":
-            sql = "SELECT * FROM drivers WHERE start_point = %s AND end_point = %s AND date_of_travel = %s "
+            sql = "SELECT * FROM drivers WHERE start_point = %s AND end_point = %s AND date_of_travel = %s"
             val = (user_data[message.chat.id]['start_point'], user_data[message.chat.id]['end_point'], user_data[message.chat.id]['date_of_travel'],)
-            mycursor.execute(sql, val)
-            myresult_1 = mycursor.fetchall()
+            cursor.execute(sql, val)
+            myresult_1 = cursor.fetchall()
             myresult = list(myresult_1)
             for i in myresult:
-
-                bot.send_message(message.chat.id, '===========\nОткуда: '+str(i[2])+'\nКуда: '+str(i[3])+'\nКогда: '+str(i[4])+'\nВремя: '+str(i[5])+'\nТип траспорта: '+str(i[6])+'\nКоличество пассажиров: '+str(i[7])+'\nЦена: '+str(i[8])+'\nНомер: '+i[9]+'\n============'+'\n')
+                t = datetime.strptime(str(i[2]), "%H:%M:%S")
+                q = str(i[6])
+                today = datetime.today()
+                td = today.strftime("%Y-%m-%d")
+                if q == td:
+                    q = "(Сегодня)"
+                else:
+                    q = "(Завтра)"
+                w = datetime.strptime(str(i[6]), "%Y-%m-%d")
+                res = w.strftime("%d.%m ")+q
+                bot.send_message(message.chat.id, '==========\nКто: Водитель\nОткуда: '+str(i[3])+'\nКуда: '+str(i[5])+'\nКогда: '+res+'\nВремя: '+t.strftime("%H:%M")+'\nТип транспорта: '+str(i[1])+'\nКоличество мест: '+str(i[9])+'\nЦена: '+str(i[7])+'\nКонтакты: '+str(i[8])+'\n==========')
         else:
             sql = "SELECT * FROM passengers WHERE start_point = %s AND end_point = %s AND date_of_travel = %s "
             val = (user_data[message.chat.id]['start_point'], user_data[message.chat.id]['end_point'], user_data[message.chat.id]['date_of_travel'],)
-            mycursor.execute(sql, val)
-            myresult_1 = mycursor.fetchall()
+            cursor.execute(sql, val)
+            myresult_1 = cursor.fetchall()
             myresult = list(myresult_1)
             for i in myresult:
-                bot.send_message(message.chat.id, '===========\nОткуда: '+str(i[2])+'\nКуда: '+str(i[3])+'\nКогда: '+str(i[4])+'\nВремя: '+str(i[5])+'\nТип траспорта: '+str(i[6])+'\nКоличество пассажиров: '+str(i[7])+'\nЦена: '+str(i[8])+'\nНомер: '+i[9]+'\n============'+'\n')
+                t = datetime.strptime(str(i[2]), "%H:%M:%S")
+                q = str(i[6])
+                today = datetime.today()
+                td = today.strftime("%Y-%m-%d")
+                if q == td:
+                    q = "(Сегодня)"
+                else:
+                    q = "(Завтра)"
+                w = datetime.strptime(str(i[6]), "%Y-%m-%d")
+                res = w.strftime("%d.%m ")+q
+                bot.send_message(message.chat.id, '==========\nКто: Пассажир\nОткуда: '+str(i[3])+'\nКуда: '+str(i[5])+'\nКогда: '+res+'\nВремя: '+t.strftime("%H:%M")+'\nТип транспорта: '+str(i[1])+'\nКоличество мест: '+str(i[9])+'\nЦена: '+str(i[7])+'\nКонтакты: '+str(i[8])+'\n==========')
 
     return send_result(message)
 
@@ -415,31 +419,19 @@ def send_result(message):
         bot.register_next_step_handler(message, post_message)
 
     if user_data[message.chat.id]['role'] =='Водитель':
-        sql = "INSERT INTO drivers(user_id, start_point, end_point, date_of_travel, time_of_travel, type_of_transport, number_of_seats, price_of_travel, telephone) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        sql = """INSERT INTO drivers (user_id, start_point, end_point, date_of_travel, time_of_travel, type_of_transport, number_of_seats, price_of_travel, telephone) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
         val = (user_data[message.chat.id]['id'], user_data[message.chat.id]['start_point'], user_data[message.chat.id]['end_point'], user_data[message.chat.id]['date_of_travel'], user_data[message.chat.id]['time_of_travel'], user_data[message.chat.id]['type_of_transport'], user_data[message.chat.id]['number_of_seats'], user_data[message.chat.id]['price_of_travel'], user_data[message.chat.id]['telephone'])
-        mycursor.execute(sql, val)
-        mydb.commit()
+        cursor.execute(sql, val)
+        connection.commit()
     else:
-        sql = "INSERT INTO passengers(user_id, start_point, end_point, date_of_travel, time_of_travel, type_of_transport, number_of_seats, price_of_travel, telephone) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        sql = """INSERT INTO passengers (user_id, start_point, end_point, date_of_travel, time_of_travel, type_of_transport, number_of_seats, price_of_travel, telephone) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
         val = (user_data[message.chat.id]['id'], user_data[message.chat.id]['start_point'], user_data[message.chat.id]['end_point'], user_data[message.chat.id]['date_of_travel'], user_data[message.chat.id]['time_of_travel'], user_data[message.chat.id]['type_of_transport'], user_data[message.chat.id]['number_of_seats'], user_data[message.chat.id]['price_of_travel'], user_data[message.chat.id]['telephone'])
-        mycursor.execute(sql, val)
-        mydb.commit()
-
-
-
-
+        cursor.execute(sql, val)
+        connection.commit()
 
 def post_message(message):
     if message.text.lower() == 'отправить':
-        bot.send_message(-1001561468463, f"Кто: {user_data[message.chat.id]['role']}\n"
-                                         f"Откуда: {user_data[message.chat.id]['start_point']}\n"
-                                         f"Куда: {user_data[message.chat.id]['end_point']}\n"
-                                         f"Когда: {user_data[message.chat.id]['date_of_travel']}\n"
-                                         f"Время: {user_data[message.chat.id]['time_of_travel']}\n"
-                                         f"Тип транспорта: {user_data[message.chat.id]['type_of_transport']}\n"
-                                         f"Количество мест: {user_data[message.chat.id]['number_of_seats']}\n"
-                                         f"Цана: {user_data[message.chat.id]['price_of_travel']}\n"
-                                         f"Номер телефона: {user_data[message.chat.id]['telephone']}" )
+        bot.send_message(-1001561468463, f"Кто: {user_data[message.chat.id]['role']}\nОткуда: {user_data[message.chat.id]['start_point']}\nКуда: {user_data[message.chat.id]['end_point']}\nКогда: {user_data[message.chat.id]['date_of_travel1']}\nВремя: {user_data[message.chat.id]['time_of_travel']}\nТип транспорта: {user_data[message.chat.id]['type_of_transport']}\nКоличество мест: {user_data[message.chat.id]['number_of_seats']}\nЦана: {user_data[message.chat.id]['price_of_travel']}\nКонтакты: {user_data[message.chat.id]['telephone']}")
         markup = types.ReplyKeyboardRemove(selective=False)
         bot.send_message(message.chat.id, 'Ваш пост отправлен!', reply_markup=markup)
         bot.send_message(message.chat.id, 'Нажмите на /kettik для того, чтобы начать.', reply_markup=markup)
@@ -448,21 +440,8 @@ def post_message(message):
         bot.send_message(message.chat.id, 'Нажмите на /kettik для того, чтобы начать.', reply_markup=markup)
 
 
-def telegram_polling():
-    try:
-        bot.polling(none_stop=True, timeout=60) #constantly get messages from Telegram
-    except:
-        traceback_error_string=traceback.format_exc()
-        with open("Error.Log", "a") as myfile:
-            myfile.write("\r\n\r\n" + time.strftime("%c")+"\r\n<<ERROR polling>>\r\n"+ traceback_error_string + "\r\n<<ERROR polling>>")
-        bot.stop_polling()
-        time.sleep(10)
-        telegram_polling()
+
 bot.enable_save_next_step_handlers(delay=2)
 bot.load_next_step_handlers()
 
-if __name__ == '__main__':
-
-    server.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
-
-    telegram_polling()
+bot.infinity_polling()
